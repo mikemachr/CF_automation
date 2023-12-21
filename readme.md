@@ -8,4 +8,4 @@ with the needed fields for driver payment reports. Currently only handles Bay Ar
 
 ## Output 
 
-A csv file containing the payment report for the day. 
+A csv file containing the post shift report per coast (2 files).

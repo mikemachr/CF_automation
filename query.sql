@@ -30,7 +30,6 @@ SELECT distinct TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title 
     END
     AS actual_time_of_arrival,
 
-
     --TO_CHAR(drd.actual_start_time,'HH:MI AM') AS actual_time_of_arrival,
 
     --End timestamp
@@ -56,7 +55,18 @@ SELECT distinct TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title 
     EXTRACT(EPOCH FROM (drd.actual_start_time - drd.expected_start_time)) / 60 
     ELSE 0
     END
-    AS late_for_pickup
+    AS late_for_pickup,
+
+    --COAST INDICATOR
+
+    CASE 
+    WHEN rr.area_id = 1 THEN 'EC'
+    WHEN rr.area_id = 2 THEN 'WC'
+    END AS coast,
+    
+    -- used just for ordering
+    dr.meal_id
+
     FROM driver_routes AS dr
 
     -- stops to drv routes
@@ -65,11 +75,30 @@ SELECT distinct TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title 
     LEFT JOIN packages on rs.package_id = packages.id
     -- packages to orgs
     LEFT JOIN organizations orgs on packages.organization_id = orgs.id
-
+    -- routes to route details
     LEFT JOIN driver_route_details drd ON dr.id = drd.driver_route_id
+    -- routes to drivers
     LEFT JOIN drivers d on dr.driver_id = d.id
+    -- routes to dispatchers
     LEFT JOIN admins a ON a.id = dr.dispatcher_id 
+    -- routes to regions
     LEFT JOIN route_regions rr ON rr.id = dr.route_region_id
+    -- routes to meals
     LEFT JOIN meals m on m.id = dr.meal_id 
-    WHERE DATE_TRUNC('day', drd.expected_start_time) = CURRENT_DATE
+
+-- Filter based on local times
+    WHERE DATE_TRUNC('day',
+
+    CASE 
+    --east coast
+    WHEN rr.area_id = 1 
+    THEN drd.expected_start_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York'
+    --bay area
+    WHEN rr.area_id = 2
+    THEN drd.expected_start_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Los_Angeles'
+    END
+
+    ) = CURRENT_DATE
+    -- orders resulting query  
+    ORDER BY coast, dr.meal_id,driver_name
     ;

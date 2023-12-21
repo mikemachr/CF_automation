@@ -10,10 +10,7 @@ db_host = config('DB_HOST')
 db_user = config('DB_USER')
 db_password = config('DB_PASSWORD')
 
-# Replace the following with your PostgreSQL connection details
 conn = psycopg2.connect(database=db_name, user=db_user, password=db_password, host=db_host)
-
-# Continue with the rest of the code as before
 
 
 query_file_path = 'query.sql'
@@ -27,6 +24,6 @@ df = pd.read_sql_query(sql_query, conn)
 # Close the database connection
 conn.close()
 df['late_for_pickup'] = round(df['late_for_pickup'])
-# Now, 'df' contains the result of your query as a pandas DataFrame
-print(df)
-df.to_csv('post_shift.csv',index=False)
+df = df.drop('meal_id',axis=1)
+df.loc[df['coast']=='EC'].to_csv('EC_post_shift.csv',index=False)
+df.loc[df['coast']=='WC'].to_csv('WC_post_shift.csv',index=False)
