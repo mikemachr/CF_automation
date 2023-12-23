@@ -1,4 +1,4 @@
-SELECT distinct TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title as shift,
+SELECT TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title as shift,dr.id,
 (a.first_name ||' ' || a.last_name) as dispatcher_name, d.id as driver_id,
     (d.first_name || ' ' || d.last_name) as driver_name, rr.name as region,
 
@@ -99,6 +99,8 @@ SELECT distinct TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title 
     END
 
     ) = CURRENT_DATE
+    --ensures route stops dont result in route duplication, arbitrary to choose between deliver or pickup
+    AND rs.stop_type = 'deliverShipment'
     -- orders resulting query  
     ORDER BY coast, dr.meal_id,driver_name
     ;
