@@ -101,7 +101,6 @@ SELECT TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title as shift,
     ) = CURRENT_DATE
     --ensures route stops dont result in route duplication, arbitrary to choose between deliver or pickup
     AND rs.stop_type = 'deliverShipment'
-    AND dispatcher_id = 512
     -- orders resulting query  
     ORDER BY coast, dr.meal_id,driver_name
     ;
