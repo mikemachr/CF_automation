@@ -2,11 +2,11 @@ SELECT TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title as shift,
 (a.first_name ||' ' || a.last_name) as dispatcher_name, d.id as driver_id,
     (d.first_name || ' ' || d.last_name) as driver_name, rr.name as region,
 
-    orgs.name as client, 
+    orgs.name as client,
     CASE  
     WHEN    d.driver_type = 1 THEN 'Brand Ambassador'
-    WHEN    d.driver_type = 0 AND drd.order_size >= 60 THEN 'Large (60+)'
-    WHEN    d.driver_type = 0 AND drd.order_size < 60 THEN 'Small (-60)'
+    WHEN    d.driver_type = 0 AND packages.serving_size >= 60 THEN 'Large (60+)'
+    WHEN    d.driver_type = 0 AND packages.serving_size < 60 THEN 'Small (-60)'
     END AS serving_size,
     --Time asked to start
     CASE 
@@ -101,6 +101,7 @@ SELECT TO_CHAR(drd.expected_start_time, 'MM/DD') AS month_day, m.title as shift,
     ) = CURRENT_DATE
     --ensures route stops dont result in route duplication, arbitrary to choose between deliver or pickup
     AND rs.stop_type = 'deliverShipment'
+    AND dispatcher_id = 512
     -- orders resulting query  
     ORDER BY coast, dr.meal_id,driver_name
     ;
